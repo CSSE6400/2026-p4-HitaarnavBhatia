@@ -7,7 +7,7 @@ terraform {
   }
 }
 provider "aws" {
-  region = "us-east-1"
+  region                   = "us-east-1"
   shared_credentials_files = ["./credentials"]
   default_tags {
     tags = {
@@ -24,7 +24,17 @@ resource "aws_instance" "hextris-server" {
   key_name      = "vockey"
 
   # user_data = file("./serve-hextris.sh")
-   user_data = USER_DATA
+  #  user_data = USER_DATA
+  user_data = <<EOF
+#!/bin/bash
+yum install -y httpd
+systemctl enable httpd
+systemctl start httpd
+
+yum install -y git
+cd /var/www/html
+git clone https://github.com/Hextris/hextris .
+EOF
 
   security_groups = [aws_security_group.hextris-server.name]
 
@@ -38,7 +48,7 @@ output "hextris-url" {
 }
 
 resource "aws_security_group" "hextris-server" {
-  name = "hextris-server"
+  name        = "hextris-server"
   description = "Hextris HTTP and SSH access"
 
   ingress {
