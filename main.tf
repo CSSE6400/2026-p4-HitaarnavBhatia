@@ -23,21 +23,23 @@ resource "aws_instance" "hextris-server" {
   instance_type = "t2.micro"
   key_name      = "vockey"
 
-  user_data = file("./serve-hextris.sh")
+  # user_data = file("./serve-hextris.sh")
+   user_data = USER_DATA
 
   security_groups = [aws_security_group.hextris-server.name]
-  
+
   tags = {
     Name = "hextris"
   }
 }
 
 output "hextris-url" {
-  value = "http://${aws_instance.hextris-server.public_ip}/"
+  value = aws_instance.hextris-server.public_ip
 }
 
 resource "aws_security_group" "hextris-server" {
   name = "hextris-server"
+  description = "Hextris HTTP and SSH access"
 
   ingress {
     from_port   = 80
